@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>트리그리기</title>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script>
+        var arr = [";;회사명;;",";;회사명;;사업장1;;",";;회사명;;사업장2;;회계1;;",";;회사명;;사업장2;;회계2;;",";;회사명;;사업장1;;회계1;;"];
+
+        function subStrParent(str, lastIdx) {
+            var last = lastIdx || str.length;
+            var idx = str.lastIndexOf(";;", last);
+            return str.substring(0, idx + 2);
+        }
+
+        function getParentTeamName(teamFull) {
+
+            var tempTeamName = teamFull;
+            if (teamFull.length < 5) return;
+            if (teamFull.lastIndexOf(";;") === -1) return;
+            if (teamFull.lastIndexOf(";;") < teamFull.length ) tempTeamName = subStrParent(teamFull);
+
+            if (tempTeamName.lastIndexOf(";;", tempTeamName.length -3) > 1) {
+                return subStrParent(tempTeamName, tempTeamName.length -3);
+            }
+            return "root";
+        }
+        function getTeamName(teamFull) {
+
+            var tempTeamName = teamFull;
+
+            if (teamFull.lastIndexOf(";;") === -1) return;
+            if (teamFull.lastIndexOf(";;") < teamFull.length ) tempTeamName = subStrParent(teamFull);
+            var idx = tempTeamName.lastIndexOf(";;", tempTeamName.length - 3);
+            return tempTeamName.substring(idx, tempTeamName.length).replace(/;;/g, "");
+        }
+
+        function escaping(str) {
+            return str.replace(/;;/g, "")
+        }
+
+        function appendLi (teamName)  {
+            var parentName = getParentTeamName(teamName);
+            if (!parentName) return;
+            var parentNameEscape = parentName.replace(/;/g, "\\;");
+            
+            if ($("ul."+parentNameEscape).length === 0) {
+                appendLi(parentName);
+            }
+
+            $("ul."+ parentNameEscape).append("<li>"+getTeamName(teamName)+"<ul class='"+teamName+"'></ul></li>");
+        }
+        $( document ).ready(function () {
+            arr.forEach(appendLi);
+        });
+    </script>
+</head>
+<body>
+    <ul class="root">
+
+    </ul>
+</body>
+</html>
